@@ -13,8 +13,13 @@ struct ListView: View {
     var body: some View {
         List {
             // Iterate through the items in the listViewModel and display each item using ListRowView.
-            ForEach(listViewModel.items) {
-                ListRowView(item: $0)
+            ForEach(listViewModel.items) { item in
+                ListRowView(item: item)
+                    .onTapGesture {
+                        withAnimation(.linear(duration: 0.15)) {
+                            listViewModel.updateItem(item: item)
+                        }
+                    }
             }
             // Enable item deletion by swiping and performing the deleteItem function from listViewModel.
             .onDelete(perform: listViewModel.deleteItem)
