@@ -7,22 +7,31 @@
 
 import Foundation
 
+/*
+ @AppStorage kullanmama nedenimiz yapacagimiz islemlerin class icinde olmasıdir.
+ Eger islemi view icinde yapsaydik orada @AppStorage kullanmamiz daha iyi olurdu.
+ */
 class ListViewModel: ObservableObject {
     
-    @Published var items: [ItemModel] = []
+    @Published var items: [ItemModel] = [] {
+        didSet {
+            saveItem()
+        }
+    }
+    
+    let itemsKey = "items_list"
     
     init() {
         getItems() // Call the 'getItems()' function when the class is initialized.
     }
-    
+    // Fetches data from UserDefaults and assigns it to the 'items' array.
     func getItems() {
-        let newItems = [
-            ItemModel(title: "This is the first title", isComplated: true),
-            ItemModel(title: "This is the second title", isComplated: false),
-            ItemModel(title: "This is the third title", isComplated: true)
-        ]
+        guard
+            let data = UserDefaults.standard.data(forKey: itemsKey),
+            let savedItems = try? JSONDecoder().decode([ItemModel].self, from: data)
+        else { return }
         
-        items.append(contentsOf: newItems) // Add new items to the array.
+        self.items = savedItems
     }
     
     func deleteItem(index: IndexSet) {
@@ -41,6 +50,12 @@ class ListViewModel: ObservableObject {
     func updateItem(item: ItemModel) {
         if let index = items.firstIndex(where: { $0.id == item.id }) {
             items[index] = item.updateCompletion()
+        }
+    }
+    // Saves the 'items' array to UserDefaults.
+    func saveItem() {
+        if let encodeData = try? JSONEncoder().encode(items) {
+            UserDefaults.standard.setValue(encodeData, forKey: itemsKey)
         }
     }
 }
