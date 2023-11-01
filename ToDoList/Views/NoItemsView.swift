@@ -23,7 +23,7 @@ struct NoItemsView: View {
                 
                 NavigationLink(destination: AddView()) {
                     Text("Add Something 🥳")
-                        .foregroundStyle(.windowBackground)
+                        .foregroundStyle(.white)
                         .font(.headline)
                         .frame(height: 55)
                         .frame(maxWidth: .infinity)
